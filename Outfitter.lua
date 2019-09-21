@@ -4719,8 +4719,7 @@ function Outfitter:Initialize()
 	if not self.Settings.Outfits then
 		self:InitializeOutfits()
 	end
-	
-	self:InstallDefaultSpecializationIcons()
+
 	self:AttachOutfitMethods()
 	self:CheckDatabase()
 	
@@ -5046,41 +5045,10 @@ end
 function Outfitter:InitializeSpecialOccasionOutfits()
 	local vInventoryCache = self:GetInventoryCache()
 	local vOutfit
-	
-	-- Create talent tree outfits
-	self:InitializeTalentTreeOutfits()
+
 
 	-- Create class-specific outfits
 	self:InitializeClassOutfits()
-end
-
-function Outfitter:InstallDefaultSpecializationIcons()
-	local numSpecs = GetNumSpecializations()
-	for specIndex = 1, numSpecs do
-		local _, specName, _, specIconID = GetSpecializationInfo(specIndex)
-		local scriptID = "SPECIALIZATION_"..specIndex
-		Outfitter.OutfitBar.cDefaultScriptIcons[scriptID] = specIconID
-	end
-end
-
-function Outfitter:InitializeTalentTreeOutfits()
-	local playerClass = UnitClass("player")
-
-	local numSpecs = GetNumSpecializations()
-	for specIndex = 1, numSpecs do
-		local _, specName, _, specIconID = GetSpecializationInfo(specIndex)
-
-		-- Done when the names run out
-		if not specName then
-			return
-		end
-
-		-- Create the outfit
-		local scriptID = "SPECIALIZATION_"..specIndex
-		local outfitName = playerClass..": "..specName
-		local outfit = self:CreateEmptySpecialOccasionOutfit(scriptID, outfitName)
-		outfit:SetIcon(specIconID)
-	end
 end
 
 function Outfitter:InitializeClassOutfits()
