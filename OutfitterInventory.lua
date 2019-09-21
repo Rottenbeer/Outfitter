@@ -78,7 +78,6 @@ function Outfitter:GetBagItemInfo(bagIndex, slotIndex)
 
 	itemInfo.Texture = GetContainerItemInfo(bagIndex, slotIndex)
 	-- itemInfo.Gem1, itemInfo.Gem2, itemInfo.Gem3, itemInfo.Gem4 = GetContainerItemGems(bagIndex, slotIndex)
-	itemInfo.AzeriteCodes = self:GetAzeriteCodesForLocation(location)
 	itemInfo.Location = {BagIndex = bagIndex, BagSlotIndex = slotIndex}
 	
 	return itemInfo
@@ -492,33 +491,11 @@ function Outfitter:GetSlotIDItemInfo(slotID)
 	itemInfo.Quality = GetInventoryItemQuality("player", slotID)
 	itemInfo.Texture = GetInventoryItemTexture("player", slotID)
 	-- itemInfo.Gem1, itemInfo.Gem2, itemInfo.Gem3, itemInfo.Gem4 = GetInventoryItemGems(slotID)
-	itemInfo.AzeriteCodes = self:GetAzeriteCodesForLocation(location)
 	itemInfo.Location = {SlotID = slotID}
 
 	local location = ItemLocation:CreateFromEquipmentSlot(slotID)
 
 	return itemInfo
-end
-
-function Outfitter:GetAzeriteCodesForLocation(location)
-	if not C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItem(location) then
-		return
-	end
-
-	local allTierInfo = C_AzeriteEmpoweredItem.GetAllTierInfo(location)
-	local powerIDs
-	for tierIndex, tierInfo in ipairs(allTierInfo) do
-		for _, powerID in ipairs(tierInfo.azeritePowerIDs) do
-			if C_AzeriteEmpoweredItem.IsPowerSelected(location, powerID) then
-				if not powerIDs then
-					powerIDs = {}
-				end
-				powerIDs[powerID] = true
-			end
-		end
-	end
-
-	return powerIDs
 end
 
 function Outfitter:GetNumBags()
@@ -970,8 +947,7 @@ function Outfitter._InventoryCache:FindItemIndex(pOutfitItem, pAllowSubCodeWildc
 			and vItem.UniqueID == pOutfitItem.UniqueID
 			and vItem.UpgradeTypeID == pOutfitItem.UpgradeTypeID
 			and vItem.BonusIDs == pOutfitItem.BonusIDs
-			and vItem.UpgradeID == pOutfitItem.UpgradeID
-			and Outfitter.AzeriteCodesMatch(vItem.AzeriteCodes, pOutfitItem.AzeriteCodes)) then
+			and vItem.UpgradeID == pOutfitItem.UpgradeID) then
 				if vItem.IgnoreItem then
 					vFoundIgnoredItem = vItem
 				else
@@ -1239,8 +1215,7 @@ function Outfitter._InventoryCache:ItemsAreSame(pItem1, pItem2)
 		   and pItem1.UpgradeTypeID == pItem2.UpgradeTypeID
 		   and pItem1.InstanceDifficultyID == pItem2.InstanceDifficultyID
 		   and pItem1.BonusIDs == pItem2.BonusIDs
-		   and pItem1.UpgradeID == pItem2.UpgradeID
-		   and Outfitter.AzeriteCodesMatch(pItem1.AzeriteCodes, pItem2.AzeriteCodes))
+		   and pItem1.UpgradeID == pItem2.UpgradeID)
 
 		if Outfitter.Debug.TemporaryItems
 		and not vResult then
@@ -1307,8 +1282,7 @@ function Outfitter._InventoryCache:InventorySlotContainsItem(inventorySlot, outf
 				                and item.UpgradeTypeID == outfitItem.UpgradeTypeID
 				                and item.InstanceDifficultyID == outfitItem.InstanceDifficultyID
 				                and item.BonusIDs == outfitItem.BonusIDs
-				                and item.UpgradeID == outfitItem.UpgradeID
-				                and Outfitter.AzeriteCodesMatch(item.AzeriteCodes, outfitItem.AzeriteCodes))
+				                and item.UpgradeID == outfitItem.UpgradeID)
 				
 --				if not codesMatch then
 --					Outfitter:DebugMessage("InventorySlotContainsItem: Items don't match")
