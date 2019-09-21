@@ -4821,11 +4821,6 @@ function Outfitter:Initialize()
 	self.EventLib:RegisterEvent("BANKFRAME_OPENED", self.BankFrameOpened, self)
 	self.EventLib:RegisterEvent("BANKFRAME_CLOSED", self.BankFrameClosed, self)
 	
-	-- For monitoring void storage
-	
-	self.EventLib:RegisterEvent("VOID_STORAGE_OPEN", self.VoidStorageFrameOpened, self)
-	self.EventLib:RegisterEvent("VOID_STORAGE_CLOSE", self.VoidStorageFrameClosed, self)
-	
 	-- For unequipping the dining outfit
 	
 	self.EventLib:RegisterEvent("UNIT_MANA", self.UnitHealthOrManaChanged, self, true) -- Register as a blind event handler (no event id param)

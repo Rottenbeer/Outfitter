@@ -540,13 +540,7 @@ function Outfitter:GetBagList()
 			vBagList[vIndex] = true
 		end
 	end
-	--[[
-	if self.VoidStorageIsOpen then
-		vBagList["VOID_DEPOSIT"] = true
-		vBagList["VOID_WITHDRAW"] = true
-		vBagList["VOID_STORAGE"] = true
-	end
-	]]
+
 	return vBagList
 end
 
