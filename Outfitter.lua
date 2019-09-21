@@ -4681,10 +4681,6 @@ function Outfitter:Initialize()
 		return
 	end
 	
-	-- Hook onto C_PetJournal.SummonPetByGUID so that the cooldown can be monitored
-	hooksecurefunc(C_PetJournal, "SummonPetByGUID", function () self.SummonPetByGUIDTime = GetTime() end)
-	self.SummonPetByGUIDTime = GetTime()
-	
 	-- Initialize the main UI tabs
 	self._SidebarWindowFrame.Construct(OutfitterFrame)
 	
