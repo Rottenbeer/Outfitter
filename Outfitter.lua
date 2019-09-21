@@ -293,7 +293,6 @@ Outfitter.IsDead = false
 Outfitter.IsFeigning = false
 
 Outfitter.BankFrameIsOpen = false
-Outfitter.VoidStorageIsOpen = false
 
 Outfitter.HasHWEvent = false
 
@@ -1381,14 +1380,6 @@ end
 function Outfitter:BankFrameClosed()
 	self.BankFrameIsOpen = false
 	self:BankSlotsChanged()
-end
-
-function Outfitter:VoidStorageFrameOpened()
-	self.VoidStorageIsOpen = true
-end
-
-function Outfitter:VoidStorageFrameClosed()
-	self.VoidStorageIsOpen = false
 end
 
 function Outfitter:RegenDisabled(pEvent)
@@ -5673,18 +5664,6 @@ function Outfitter.OutfitMenuActions:WITHDRAWOTHERS(pOutfit)
 	self:WithdrawOtherOutfits(pOutfit)
 end
 
-function Outfitter.OutfitMenuActions:DEPOSITVOID(pOutfit)
-	self:DepositOutfitToVoidStorage(pOutfit)
-end
-
-function Outfitter.OutfitMenuActions:DEPOSITUNIQUEVOID(pOutfit)
-	self:DepositOutfitToVoidStorage(pOutfit, true)
-end
-
-function Outfitter.OutfitMenuActions:WITHDRAWVOID(pOutfit)
-	self:WithdrawOutfitFromVoidStorage(pOutfit)
-end
-
 function Outfitter.OutfitMenuActions:OUTFITBAR_SHOW(pOutfit)
 	local vSettings = self.OutfitBar:GetOutfitSettings(pOutfit)
 	
@@ -6248,67 +6227,6 @@ function Outfitter:WithdrawOtherOutfits(pOutfit)
 	-- Execute the changes
 	
 	self:ExecuteEquipmentChangeList2(vEquipmentChangeList, vEmptyBagSlots, self.cWithdrawBagsFullError, vExpectedInventoryCache)
-	
-	self:DispatchOutfitEvent("EDIT_OUTFIT", pOutfit:GetName(), pOutfit)
-end
-
-local VOID_DEPOSIT_MAX = 8
-
-function Outfitter:DepositOutfitToVoidStorage(pOutfit, pUniqueItemsOnly)
-	local vUnequipOutfit, vInventoryCache = self:GetDepositList(pOutfit, pUniqueItemsOnly)
-	
-	-- Get a list of the deposit slot contents
-	
-	local vItemIDByDepositSlot = {}
-	local vDepositSlotByItemID = {}
-	for vIndex = 1, VOID_DEPOSIT_MAX do
-		local vItemID, vTextureName = GetVoidTransferDepositInfo(vIndex)
-		if vItemID then
-			vItemIDByDepositSlot[vIndex] = vItemID
-			vDepositSlotByItemID[vItemID] = vIndex
-		end
-	end
-	
-	-- Eliminate items which are already in the deposit area
-	
-	local vItems = vUnequipOutfit:GetItems()
-	for vInventorySlot, vOutfitItem in pairs(vItems) do
-		if vDepositSlotByItemID[vOutfitItem.Code] then
-			vItems[vInventorySlot] = nil
-		end
-	end
-	
-	-- Get a list of items which are available to move
-	
-	vInventoryCache:ResetIgnoreItemFlags()
-	local vEquipmentChangeList = Outfitter:New(Outfitter._EquipmentChanges)
-	vEquipmentChangeList:addUnequipChangesForOutfit(vUnequipOutfit, vInventoryCache) 
-	
-	-- Move the items to the deposit slots
-	
-	for _, vEquipmentChange in ipairs(vEquipmentChangeList) do
-		-- Find an empty slot
-		local vDepositIndex
-		for vIndex = 1, VOID_DEPOSIT_MAX do
-			if not vItemIDByDepositSlot[vIndex] then
-				vDepositIndex = vIndex
-				break
-			end
-		end
-		
-		-- No more slots
-		if not vDepositIndex then
-			Outfitter:DebugMessage("No empty void storage slots")
-			break
-		end
-		
-		-- Move the item
-		Outfitter:DebugMessage("Moving item to deposit slot %s", tostring(vDepositIndex))
-		self:PickupItemLocation(vEquipmentChange.FromLocation)
-		ClickVoidTransferDepositSlot(vDepositIndex, false)
-		vItemIDByDepositSlot[vDepositIndex] = vEquipmentChange.Item.Code
-		vDepositSlotByItemID[vEquipmentChange.Item.Code] = vDepositIndex
-	end
 	
 	self:DispatchOutfitEvent("EDIT_OUTFIT", pOutfit:GetName(), pOutfit)
 end

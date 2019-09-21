@@ -317,11 +317,6 @@ Outfitter.cDepositOthersToBank = "Deposit other outfits to bank"
 Outfitter.cWithdrawFromBank = "Withdraw items from bank"
 Outfitter.cWithdrawOthersFromBank = "Withdraw other outfits from bank"
 
-Outfitter.cVoidStorageCategoryTitle = "Void Storage"
-Outfitter.cDepositToVoidStorage = "Deposit all items to Void Storage"
-Outfitter.cDepositUniqueToVoidStorage = "Deposit unique items to Void Storage"
-Outfitter.cWithdrawFromVoidStorage = "Withdraw items from Void Storage"
-
 Outfitter.cMissingItemsLabel = "Missing items: "
 Outfitter.cBankedItemsLabel = "Banked items: "
 
