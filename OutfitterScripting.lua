@@ -1777,40 +1777,6 @@ Outfitter.cScriptCategoryOrder =
 	CLASS = 5,
 }
 
-function Outfitter:InstallTalentTreeScripts()
-	local _, playerClass = UnitClass("player")
-
-	-- Class talent tree scripts
-	for treeIndex = 1, 4 do
-		local name = Outfitter:GetTalentTreeName(treeIndex)
-		if not name then
-			break
-		end
-		table.insert(Outfitter.PresetScripts, {
-			Name = UnitClass("player")..": "..name,
-			ID = "SPECIALIZATION_"..treeIndex,
-			Class = playerClass,
-			Script = [[
--- $EVENTS PLAYER_ENTERING_WORLD ACTIVE_TALENT_GROUP_CHANGED
- 
--- Prevent the script from doing anything unless the specialization actually changes
-local specialization = GetSpecialization()
-if specialization == self.previousSpecialization then
-    return
-end
-self.previousSpecialization = specialization
- 
--- Equip/unequip
-equip = specialization == ]]..treeIndex..[[
- 
- 
--- Use a delay so that artifacts equip properly
-delay = 0.5
-]]
-		});
-	end
-end
-
 function Outfitter:SortScripts()
 	table.sort(
 			Outfitter.PresetScripts,
@@ -1837,7 +1803,6 @@ function Outfitter:SortScripts()
 end
 
 function Outfitter:InitializeScripts()
-	Outfitter:InstallTalentTreeScripts()
 	Outfitter:SortScripts()
 end
 
