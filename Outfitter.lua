@@ -4862,7 +4862,6 @@ function Outfitter:Initialize()
 	--
 	
 	self.EventLib:RegisterEvent("CHARACTER_POINTS_CHANGED", self.TalentsChanged, self)
-	self.EventLib:RegisterEvent("PLAYER_TALENT_UPDATE", self.TalentsChanged, self)
 	
 	self:TalentsChanged()
 	
