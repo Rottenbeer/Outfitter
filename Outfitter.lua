@@ -1230,8 +1230,6 @@ function Outfitter:PlayerEnteringWorld()
 	
 	self:ResumeLoadScreenEvents()
 	self:ScheduleSynch() -- Always sync on entering world
-	
-	self:SynchronizeEM()
 
 	self:EndEquipmentUpdate()
 end
@@ -3237,8 +3235,7 @@ function Outfitter:Reset()
 
 	self.CurrentOutfit = self:GetInventoryOutfit()
 	self:InitializeOutfits()
-	self:SynchronizeEM()
-	
+
 	self.EquippedNeedsUpdate = false
 end
 
@@ -4885,9 +4882,6 @@ function Outfitter:Initialize()
 		self:HookScript(MI2_TooltipFrame, "OnShow", self.GameToolTip_OnShow)
 		self:HookScript(MI2_TooltipFrame, "OnHide", self.GameToolTip_OnHide)
 	end
-	
-	-- Synchronize with the Equipment Manager
-	self:StartMonitoringEM()
 
 	--
 	
@@ -4912,14 +4906,6 @@ function Outfitter:Initialize()
 	
 	-- Fire things up with a simulated entrance
 	self:SchedulePlayerEnteringWorld()
-end
-
-function Outfitter:StartMonitoringEM()
-	self.EventLib:RegisterEvent("EQUIPMENT_SETS_CHANGED", self.SynchronizeEM, self)
-end
-
-function Outfitter:StopMonitoringEM()
-	self.EventLib:UnregisterEvent("EQUIPMENT_SETS_CHANGED", self.SynchronizeEM, self)
 end
 
 -- Blizzard added icon numbers in patch 6 but no API for mapping between the number and the path, so create a texture to use for doing the mapping
@@ -4986,114 +4972,6 @@ function Outfitter:AttachOutfitMethods()
 	end
 end
 
-function Outfitter:SynchronizeEM()
-	local equipmentSetIDs = C_EquipmentSet.GetEquipmentSetIDs()
-	
-	-- Mark all the EM outfits as unused
-	for vCategoryID, outfits in pairs(self.Settings.Outfits) do
-		for vIndex, outfit in ipairs(outfits) do
-			if outfit.StoredInEM then
-				outfit.Unused = true
-			end
-		end
-	end
-	
-	-- If NumEquipmentSets is zero, assume that the EM is flaking out
-	-- and save the EM-based outfits so they can be restored if the EM
-	-- happens to straighten up later
-	
-	if #equipmentSetIDs == 0 then
-		if not self.Settings.PreservedEMOutfits then
-			self.Settings.PreservedEMOutfits = {}
-		end
-		
-		for vCategoryID, outfits in pairs(self.Settings.Outfits) do
-			for vIndex, outfit in ipairs(outfits) do
-				if outfit.StoredInEM then
-					self.Settings.PreservedEMOutfits[outfit.Name] = outfit
-				end
-			end
-		end
-	end
-	
-	-- Scan the EM outfits
-	
-	for _, equipmentSetID in ipairs(equipmentSetIDs) do
-		local name = C_EquipmentSet.GetEquipmentSetInfo(equipmentSetID)
-		local outfit = self:FindEMOutfitByName(name)
-		
-		-- If the outfit is missing, see if it can be restored from
-		-- the preserved list
-		
-		if not outfit
-		and self.Settings.PreservedEMOutfits then
-			outfit = self.Settings.PreservedEMOutfits[name]
-			
-			if outfit then
-				setmetatable(outfit, Outfitter._OutfitMetaTableEM)
-				outfit.equipmentSetID = equipmentSetID
-
-				self:AddOutfit(outfit)
-				
-				self:ActivateScript(outfit)
-				if not outfit.equipmentSetID then
-					Outfitter:TestMessage("no equipmentsetID 1")
-				end
-			end
-		end
-		
-		if not outfit then
-			outfit =
-			{
-				Name = name,
-				StoredInEM = true,
-				equipmentSetID = equipmentSetID,
-				Items = {},
-			}
-			
-			setmetatable(outfit, Outfitter._OutfitMetaTableEM)
-			self:AddOutfit(outfit)
-
-			if not outfit.equipmentSetID then
-				Outfitter:TestMessage("no equipmentsetID 2")
-			end
-		else
-			outfit.Unused = nil
-		end
-	end
-	
-	-- Delete unused outfits
-	
-	for vCategoryID, outfits in pairs(self.Settings.Outfits) do
-		local vNumOutfits = #outfits
-		local vIndex = 1
-		
-		while vIndex <= vNumOutfits do
-			local outfit = outfits[vIndex]
-			
-			if outfit.StoredInEM and outfit.Unused then
-				self:DeactivateScript(outfit)
-				
-				table.remove(outfits, vIndex)
-				vNumOutfits = vNumOutfits - 1
-			else
-				vIndex = vIndex + 1
-			end
-		end
-	end
-	
-	-- If NumEquipmentSets is not zero, assume that the EM is working correctly
-	-- and get rid of any preserved outfits
-	
-	if #equipmentSetIDs > 0 then
-		self.Settings.PreservedEMOutfits = nil
-	end
-	
-	-- Done
-	
-	self.DisplayIsDirty = true
-end
-
 function Outfitter:FindEMOutfitByName(pName)
 	local vLowerName = pName:lower()
 	
@@ -5117,9 +4995,6 @@ function Outfitter:InitializeOutfits()
 	for vCategoryIndex, vCategoryID in ipairs(Outfitter.cCategoryOrder) do
 		self.Settings.Outfits[vCategoryID] = {}
 	end
-
-	-- Load the EM outfits
-	self:SynchronizeEM()
 
 	-- Create the normal outfit using the current
 	-- inventory and set it as the currently equipped outfit

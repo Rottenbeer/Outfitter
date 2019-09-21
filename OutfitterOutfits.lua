@@ -988,8 +988,6 @@ function Outfitter._OutfitMethodsEM:OutfitUsesItem(pItemInfo)
 end
 
 function Outfitter._OutfitMethodsEM:SaveEquipmentSet(iconID)
-	-- Ignore EM events while saving
-	Outfitter:StopMonitoringEM()
 	
 	-- Create the set if it's new
 	if  not self.equipmentSetID then
@@ -1001,8 +999,6 @@ function Outfitter._OutfitMethodsEM:SaveEquipmentSet(iconID)
 		C_EquipmentSet.SaveEquipmentSet(self.equipmentSetID, iconID)
 	end
 
-	-- Resume monitoring EM events
-	Outfitter:StartMonitoringEM()
 end
 
 function Outfitter._OutfitMethodsEM:StoreLocally()
