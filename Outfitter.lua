@@ -4763,7 +4763,8 @@ function Outfitter:Initialize()
 	end
 	
 	-- Move the Blizzard UI over a bit
-	PaperDollSidebarTabs:SetPoint("BOTTOMRIGHT", CharacterFrameInsetRight, "TOPRIGHT", -30, -1)
+	-- FIXME: Needs to be fixed later
+	--PaperDollSidebarTabs:SetPoint("BOTTOMRIGHT", CharacterFrameInsetRight, "TOPRIGHT", -30, -1)
 	
 	-- Initialize player state
 	
