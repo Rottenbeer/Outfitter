@@ -2014,39 +2014,7 @@ function Outfitter:AddOutfitMenu(menu, outfit)
 			self:SetOutfitBindingIndex(outfit, value - 1)
 		end
 	end)
-	
-	-- Get the titles
-	local titles = self:GetSortedTitles()
 
-	-- Build the menu
-	local maxTitlesPerMenu = 30
-	menu:AddChildMenu(self.cPlayerTitle, function (submenu)
-		local startIndex = 1
-
-		-- Add the None item
-		submenu:AddToggle(self.cNone,
-			function ()
-				return outfit.ShowTitleID == nil
-			end, function (menu, value)
-				outfit.ShowTitleID = nil
-
-				Outfitter.HasHWEvent = true
-				self.OutfitStack:UpdateOutfitDisplay()
-				Outfitter.HasHWEvent = false
-			end)
-
-		-- Add a select menu for groups of titles
-		while startIndex <= #titles do
-			local endIndex = startIndex + maxTitlesPerMenu - 1
-			if endIndex > #titles then
-				endIndex = #titles
-			end
-			
-			self:AddTitleSelectMenu(submenu, tostring(startIndex).." - "..tostring(endIndex), outfit, titles, startIndex, maxTitlesPerMenu)
-			
-			startIndex = endIndex + 1
-		end
-	end)
 	menu:AddChildMenu(self.cBankCategoryTitle, function (submenu)
 		submenu:AddFunction(self.cDepositToBank, function () self:PerformAction("DEPOSIT", outfit) end, not self.BankFrameIsOpen)
 		submenu:AddFunction(self.cDepositUniqueToBank, function () self:PerformAction("DEPOSITUNIQUE", outfit) end, not self.BankFrameIsOpen)
@@ -2173,67 +2141,6 @@ function Outfitter:AddOutfitMenu(menu, outfit)
 				self:PerformAction("OUTFITBAR_CHOOSEICON", outfit)
 			end)
 	end
-end
-
-function Outfitter:GetSortedTitles()
-	local titles = {}
-
-	-- Gather the list of known titles
-	local numTitles = GetNumTitles()
-	for titleIndex = 1, numTitles do
-		if IsTitleKnown(titleIndex) then
-			local titleName = GetTitleName(titleIndex)
-			table.insert(titles, {name = titleName, index = titleIndex})
-		end
-	end
-
-	-- Sort the list
-	table.sort(titles, function (a, b)
-		return a.name < b.name
-	end)
-
-	return titles
-end
-
-function Outfitter:AddTitleSelectMenu(menu, menuTitle, outfit, titles, startIndex, maxTitles)
-	-- Calculate the endIndex
-	local endIndex = startIndex + maxTitles - 1
-	if endIndex > #titles then
-		endIndex = #titles
-	end
-
-	-- Build the list of values
-	local values = {}
-	for titleIndex = startIndex, endIndex do
-		table.insert(values, titles[titleIndex].name)
-	end
-
-	menu:AddSelect(menuTitle, values,
-		function ()
-			local selectedTitleIndex = outfit.ShowTitleID
-			if not selectedTitleIndex then
-				selectedTitleIndex = -1
-			end
-			for titleIndex = startIndex, endIndex do
-				if titles[titleIndex].index == selectedTitleIndex then
-					return titleIndex - startIndex + 1
-				end
-			end
-		end, function (menu, value)
-			local title = titles[value + startIndex - 1]
-
-			-- No title for the first index
-			if title.index == -1 then
-				outfit.ShowTitleID = nil
-
-			-- Find the titleID for the index
-			else
-				outfit.ShowTitleID = title.index
-			end
-			Outfitter.HasHWEvent = true
-			self.OutfitStack:UpdateOutfitDisplay()
-			Outfitter.HasHWEvent = false
-		end)
 end
 
 function Outfitter:AddScriptCategorySubmenu(menu, category, get, set)
