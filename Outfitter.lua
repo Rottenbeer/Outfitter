@@ -4637,10 +4637,6 @@ function Outfitter:Initialize()
 		OutfitterMinimapButton:SetPosition(self.Settings.Options.MinimapButtonX, self.Settings.Options.MinimapButtonY)
 	end
 	
-	-- Move the Blizzard UI over a bit
-	-- FIXME: Needs to be fixed later
-	--PaperDollSidebarTabs:SetPoint("BOTTOMRIGHT", CharacterFrameInsetRight, "TOPRIGHT", -30, -1)
-	
 	-- Initialize player state
 	
 	self.SpiritRegenEnabled = true
