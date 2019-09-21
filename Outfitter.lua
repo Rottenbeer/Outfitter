@@ -7538,9 +7538,9 @@ function Outfitter:SynchronizeCompanionState()
 	end
 end
 
+-- FIXME: Not sure where this is used
 function Outfitter:GetTalentTreeName(pIndex)
-	local _, vName = GetSpecializationInfo(pIndex)
-	return vName
+	return "TALENT_TREE_NAME_PLACEHOLDER"
 end
 
 function Outfitter:Run(pText)
