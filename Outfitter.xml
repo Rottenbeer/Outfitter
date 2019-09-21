@@ -579,12 +579,12 @@
 		<Frames>
 			<Button name="OutfitterButton" hidden="false">
 				<Size>
-					<AbsDimension x="64" y="32"/>
+					<AbsDimension x="64" y="35"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="0" y="-27"/>
+							<AbsDimension x="-25" y="-27"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -608,7 +608,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="0" y="-30"/>
+							<AbsDimension x="-32" y="-30"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
