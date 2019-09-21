@@ -40,11 +40,7 @@ end
 function Outfitter._FlyoutQuickSlots:PostClick(pButton, ...)
 	local vSlotItemLink = Outfitter:GetInventorySlotIDLink(pButton.id or pButton:GetID())
 	
-	if EquipmentFlyoutFrame:IsVisible() and EquipmentFlyoutFrame.button == pButton then
-		EquipmentFlyoutFrame:Hide()
-
-	-- If there's an item on the cursor after clicking or the slot is empty then open the flyout
-	elseif CursorHasItem() or not vSlotItemLink then
+	if CursorHasItem() or not vSlotItemLink then
 		pButton.popoutButton.flyoutLocked = true
 		EquipmentFlyout_Show(pButton)
 		EquipmentFlyoutPopoutButton_SetReversed(pButton.popoutButton, true)
